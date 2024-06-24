@@ -73,11 +73,16 @@ fun Application.module(jdbcUrl: String, username: String, password: String) {
         autoAck = true,
     ).start()
 
-    // TODO - MESSAGING -
     //  set up the rabbit configuration for your safer queue and
+    BasicRabbitConfiguration(exchange = "products-exchange", queue = "safer-products", routingKey = "safer").setUp()
     //  start the rabbit listener with the safer product update handler **with manual acknowledgement**
+    BasicRabbitListener(
+        queue = "safer-products",
+        delivery = SaferProductUpdateHandler(productService),
+        cancel = ProductUpdateCancelHandler(),
+        autoAck = true,
+    ).start()
     //  this looks similar to the above invocation
-
 }
 
 fun main() {
